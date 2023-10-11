@@ -54,9 +54,11 @@ export const adminLogin = async (req: Request, res: Response): Promise<any> => {
           return res.status(400).json({ Login: false, msg: "Invalid credentials" })
         }
     
-        res.status(200).json({ msg: "Admin Login successful", admin: admin })
+        res.status(200).json({ msg: "Admin Login successful", admin: admin });
       } catch (error) {
         console.error(error)
-        res.status(500).json({ error: "Internal server error" })
+        res.status(500).json({ error: "Internal server error" });
+        console.log("err");
+        
       }
 }
