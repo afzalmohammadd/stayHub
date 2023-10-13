@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
-import { LoginRequest } from "../types/PayloadInterface"
+import { LoginRequest,RegistrationRequest } from "../types/PayloadInterface"
 
 // userLogin
 interface LoginResponse {
@@ -9,14 +9,18 @@ interface LoginResponse {
 
 export const userLogin = async (
   values: LoginRequest
-): Promise<LoginResponse> => {
+): Promise<LoginResponse > => {
+  console.log("entering to userLogin API function");
+  
   try {
-    const response: AxiosResponse<LoginResponse> = await axios.post(
+    console.log("jkjkjkjkjkjkjk");
+    
+    const response: AxiosResponse<LoginResponse> = await axios.post(      
       "http://localhost:5000/Login",
       values
     );
 
-    return response.data; // Assuming the response contains data field with token
+    return response.data; 
   } catch (error) {
     console.log("Error when User Login:",error);
     
@@ -24,4 +28,27 @@ export const userLogin = async (
     throw error;
   }
 };
+
+// userRegistration
+interface RegistrationResponse {
+  user:any
+} 
+
+export const  userReg = async (
+  values: RegistrationRequest
+): Promise<RegistrationResponse | undefined> => {
+  try {
+    const response: AxiosResponse<RegistrationResponse> = await axios.post(
+      "http://localhost:5000/Register",
+      values
+    )
+
+    return response.data;
+  } catch (error) {
+    console.log("Error when user Registration",error);
+    
+  }
+}
+
+
 

@@ -5,38 +5,46 @@ import jwt from "jsonwebtoken"
 import { Request, Response } from 'express'
 
 export const Register = async (req: Request, res: Response): Promise<any> => {
+  console.log("entering to the Registration");
+  
   try {
 
-    const { Name, Email, Phone, Password } = req.body as {
-      Name: string;
-      Email: string;
-      Phone: string;
-      Password: string;
+    const { name, email, phone, password } = req.body as {
+      name: string;
+      email: string;
+      phone: string;
+      password: string;
     };
 
-    const existUser = await User.findOne({ Email })
+    console.log(req.body);
+    console.log(password);
+    
+    
+
+    const existUser = await User.findOne({ email })
 
     if (existUser) {   
       return res.status(400).json({ msg: "Email already exists" })
     }
  
-    const salt = await bcrypt.genSalt()
-
-    const passwordHash = await bcrypt.hash(Password, salt)
+    const salt = await bcrypt.genSalt(10); 
+    const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      Name,
-      Email,
+      Name :name,
+      Email :email,
       Password: passwordHash,
-      Phone,
+      Phone : phone,
     });
 
     const SaveUser = await newUser.save()
 
     res.status(201).json({ msg: "User registered successfully", user: SaveUser })
+    console.log("user registration succesfull S");
+    
   } catch (error) {
     
-    console.error(error)
+    console.error("gasfjkl",error)
    
     res.status(500).json({ error: "Internal server error" })
   }
@@ -44,11 +52,17 @@ export const Register = async (req: Request, res: Response): Promise<any> => {
 
 
 export const Login = async (req: Request, res: Response): Promise<any> => {
+  console.log("entering logginpage of user");
+  
     try {
-      const { Email, Password } = req.body
+      console.log(req.body);
+      
+      const { email, password } = req.body
   
-      const user = await User.findOne({ Email: Email })
-  
+      const user = await User.findOne({ Email: email })
+      console.log(user);
+      
+      
       if (!user) {
         return res.status(400).json({ Login: false, msg: "User does not exist" })
       }
@@ -56,8 +70,11 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
       if (user.block) {
         return res.status(400).json({ Login: false, msg: "User is blocked" })
       }
-  
-      const passMatch = await bcrypt.compare(Password, user.Password)
+      console.log("1",password,"  2",user.Password);
+      console.log(user.Password);
+      
+      
+      const passMatch = await bcrypt.compare(password, user.Password)
   
       if (!passMatch) {
         return res.status(400).json({ Login: false, msg: "Invalid credentials" })

@@ -4,5 +4,13 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegistrationRequest {
+  name: string;
+  email: string
+  phone: string
+  password:string
+  confirmPassword:string
+}
+
 
 
