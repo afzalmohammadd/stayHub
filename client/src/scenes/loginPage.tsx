@@ -11,6 +11,8 @@ import { loginSuccess } from "../Redux/slice/User/userLoginAuthSlice";
 import { userLogin } from "../API/userRoutes";
 import { setToken } from "../Redux/slice/User/tokenSlice";
 import { toast } from "react-toastify";
+import { setUserDetails } from "../Redux/slice/User/userDetailsSlice";
+import GoogleLoginComponent from "../components/User/googleLogin";
 
 const LoginPage = () => {
   console.log("entering to loginPage");
@@ -37,7 +39,7 @@ const LoginPage = () => {
       dispatch(loginSuccess());
     }
     if (isLoggedIn === true) {
-      navigate("/"); //to homePage
+      navigate("/"); 
     }
   }, [navigate]);
 
@@ -51,9 +53,18 @@ const LoginPage = () => {
     
     userLogin(formData)
       .then((response) => {
+        const user = response.user
         const token = response.token;
         dispatch(setToken(token));
         dispatch(loginSuccess());
+        const userDetailsData = {
+          name: user.Name,
+          email: user.Email,
+          phone: user.Phone,
+        };
+        dispatch(setUserDetails(userDetailsData))
+        console.log(userDetailsData,"lplplpllplplplplplplplplplplpl");
+        
 
         notify("Login success", "success");
         setTimeout(() => {
@@ -61,7 +72,11 @@ const LoginPage = () => {
         }, 2000);
       })
       .catch((error: any) => {
+        console.log(error,"?");
+      
+        
         notify(error.message, "error");
+
       });
   };
 
@@ -153,10 +168,9 @@ const LoginPage = () => {
               <p className=" absolute text-black/80 bg-[#f5f5f5]">OR</p>
             </div>
 
-            <button className="w-full my-2 font-semibold text-black border-black/40 border rounded-md p-4 text-center flex items-center justify-center">
-              <img src="google.svg" className="h-6 mr-2" alt="" />
-              SIGN IN WITH GOOGLE
-            </button>
+            <div className="w-full my-2 rounded-md p-4 text-center flex items-center justify-center">
+          <GoogleLoginComponent />
+        </div>
           </div>
 
           <div className="w-full">

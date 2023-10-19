@@ -1,33 +1,44 @@
 import { Request, Response } from 'express'; 
 import bcrypt from 'bcrypt'
 import Admin from '../../Models/admin'
+import jwt from "jsonwebtoken"
 
 export const adminReg = async (req:Request,res:Response):Promise<any> => {
     try {
 
-        const {  Email, Password } = req.body as {     
-          Email: string;
-          Password: string;
+      console.log("entering the admin registration function ");
+      console.log(req.body);
+      
+        const {  email, password } = req.body as {     
+          email: string;
+          password: string;
         };
-    
-        const existAdmin = await Admin.findOne({ Email })
+
+        console.log(email,password);
+        
+        
+        const existAdmin = await Admin.findOne({ email })
     
         if (existAdmin) {   
-          return res.status(400).json({ msg: "Email already exists" })
+          return res.status(400).json({ message: "Email already exists" })
         }
+        
      
-        const salt = await bcrypt.genSalt()
+        const salt = await bcrypt.genSalt(10)
     
-        const passwordHash = await bcrypt.hash(Password, salt)
+        const passwordHash = await bcrypt.hash(password, salt)
     
         const newAdmin = new Admin({
-          Email,
-          Password: passwordHash,
+          email: email,
+          Password: passwordHash
         });
+
+        console.log(newAdmin,"kikikikik");
+        
     
         const SaveAdmin = await newAdmin.save()
     
-        res.status(201).json({ msg: "User registered successfully", user: SaveAdmin })
+        res.status(201).json({ message: "admin registered successfully", admin: SaveAdmin })
       } catch (error) {
         
         console.error(error)
@@ -40,21 +51,26 @@ export const adminReg = async (req:Request,res:Response):Promise<any> => {
 export const adminLogin = async (req: Request, res: Response): Promise<any> => {
   
     try {
-        const { Email, Password } = req.body
+      console.log("entering to the admin login function");
+      
+        const { email, password } = req.body
     
-        const admin = await Admin.findOne({ Email: Email })
+        const admin = await Admin.findOne({ email: email })
     
         if (!admin) {
-          return res.status(400).json({ Login: false, msg: "Admin does not exist" })
+          return res.status(400).json({ Login: false, message: "Admin does not exist" })
         }
     
-        const passMatch = await bcrypt.compare(Password, admin.Password)
+        const passMatch = await bcrypt.compare(password, admin.Password)
     
         if (!passMatch) {
-          return res.status(400).json({ Login: false, msg: "Invalid credentials" })
+          return res.status(400).json({ Login: false, message: "Invalid credentials" })
         }
+
+        const admintoken = jwt.sign({ adminId:admin._id },process.env.JWT_SECRET as string, {
+          expiresIn: '1h'})
     
-        res.status(200).json({ msg: "Admin Login successful", admin: admin });
+        res.status(200).json({ message: "Admin Login successful", admin: admin , admintoken:admintoken });
       } catch (error) {
         console.error(error)
         res.status(500).json({ error: "Internal server error" });

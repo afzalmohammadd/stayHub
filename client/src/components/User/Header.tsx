@@ -1,10 +1,31 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import { useState } from "react";
+import { UseSelector, useSelector } from "react-redux/es/hooks/useSelector";
+import { RootState } from "../../Redux/Reducer/Reducer";
+import { useSelect } from "@material-tailwind/react";
+import { logout } from "../../Redux/slice/User/userLoginAuthSlice";
+import { useDispatch } from "react-redux";
+import { clearToken } from "../../Redux/slice/User/tokenSlice";
 
 const Header = () => {
+  let navigate = useNavigate();
+  let dispatch = useDispatch()
 
-  let navigate = useNavigate()
+  const isLoggedIn = useSelector(
+    (state: RootState) => state.userAuth.isLoggedIn
+  );
+  const userDetails = useSelector((state: RootState) => state.userDetails);
+  const userName = userDetails.name;
+
+  const [showLogoutButton, setShowLogoutButton] = useState(false)
+
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(clearToken())
+    navigate("/")
+  };
+
   return (
     <div>
       <div className="relative h-72 bg-teal-700">
@@ -21,7 +42,6 @@ const Header = () => {
               <h1>StayHub.Com</h1>
             </button>
           </div>
-
           <div className="mr-7 ml-auto mt-5 ">
             <button className="text-white font-semibold text-sm">
               <svg
@@ -47,10 +67,38 @@ const Header = () => {
             </button>
           </div>
           <div className="mt-4 mr-20">
-            <button  onClick={()=>{navigate("/login")}} className="bg-white px-2 py-1 text-teal-700 font-semibold rounded-lg text-sm">
-              Login
+      {isLoggedIn ? (
+        <div className="bg-white px-2 py-1 text-teal-700 font-semibold rounded-lg text-sm">
+          Hello, {userName}
+          <button
+            onClick={() => {
+              setShowLogoutButton(!showLogoutButton); // Toggle the visibility of the logout button
+            }}
+            className="bg-white px-2 py-1 text-teal-700 font-semibold rounded-lg text-sm"
+          >
+            {showLogoutButton ? "▲" : "▼"} {/* Display up or down arrow based on the state */}
+          </button>
+          {showLogoutButton && ( // Render the logout button if showLogoutButton is true
+            <button
+              onClick={handleLogout}
+              className="bg-white px-2 py-1 text-teal-700 font-semibold rounded-lg text-sm"
+            >
+               Log Out
             </button>
-          </div>
+          )}
+          {/* Additional content for authenticated users */}
+        </div>
+      ) : (
+        <button
+          onClick={() => {
+            navigate("/login");
+          }}
+          className="bg-white px-2 py-1 text-teal-700 font-semibold rounded-lg text-sm"
+        >
+          Login
+        </button>
+      )}
+    </div>
         </div>
         <div className=" w-8/12 h-32 mt-24 pt-3.5 absolute inset-y-0 right-0 mr-60 mt-0 flex ">
           <div className="ml-7 mt-4">
@@ -58,7 +106,7 @@ const Header = () => {
               Discover Your Next Getaway
             </h1>
             <h3 className="text-white font-normal text-2xl  mt-3.5 ">
-            Explore Exclusive Offers on Hotels, Vacation Homes, and More...
+              Explore Exclusive Offers on Hotels, Vacation Homes, and More...
             </h3>
           </div>
         </div>

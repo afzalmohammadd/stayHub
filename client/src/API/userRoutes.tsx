@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
-import { LoginRequest,RegistrationRequest } from "../types/PayloadInterface"
+import { LoginRequest,RegistrationRequest,GoogleLogin } from "../types/PayloadInterface"
 
 // userLogin
 interface LoginResponse {
@@ -28,6 +28,24 @@ export const userLogin = async (
     throw error;
   }
 };
+ 
+// Google Auth
+
+export const googleLogin = async (
+  values:any
+): Promise<LoginResponse> => {
+  try {
+    const response: AxiosResponse<LoginResponse> = await axios.post(
+      "http://localhost:5000/GoogleLogin",
+      values
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log("Error when Google Login:", error);
+    throw error;
+  }
+}
 
 // userRegistration
 interface RegistrationResponse {
@@ -49,6 +67,8 @@ export const  userReg = async (
     
   }
 }
+
+
 
 
 

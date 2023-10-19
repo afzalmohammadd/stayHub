@@ -20,7 +20,7 @@ const initialState: tokenState ={
 }
 
 const tokenSlice = createSlice({
-    name: "token",
+    name: "admin-token",
     initialState,
     reducers: {
         setToken :(state,action:PayloadAction<string>) => {

@@ -23,11 +23,11 @@ export interface IUser extends Document {
       },
       Phone: {
         type: String,
-        required: true,
+        required: false,
       },
       Password: {
         type: String,
-        required: true,
+        required: false,
         min: 5,
       },
       block: {

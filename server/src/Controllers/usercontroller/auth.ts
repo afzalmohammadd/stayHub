@@ -24,7 +24,7 @@ export const Register = async (req: Request, res: Response): Promise<any> => {
     const existUser = await User.findOne({ email })
 
     if (existUser) {   
-      return res.status(400).json({ msg: "Email already exists" })
+      return res.status(400).json({ message: "Email already exists" })
     }
  
     const salt = await bcrypt.genSalt(10); 
@@ -39,7 +39,7 @@ export const Register = async (req: Request, res: Response): Promise<any> => {
 
     const SaveUser = await newUser.save()
 
-    res.status(201).json({ msg: "User registered successfully", user: SaveUser })
+    res.status(201).json({ message: "User registered successfully", user: SaveUser })
     console.log("user registration succesfull S");
     
   } catch (error) {
@@ -62,13 +62,12 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
       const user = await User.findOne({ Email: email })
       console.log(user);
       
-      
       if (!user) {
-        return res.status(400).json({ Login: false, msg: "User does not exist" })
+        return res.status(400).json({ Login: false, message: "User not found" })
       }
-  
+
       if (user.block) {
-        return res.status(400).json({ Login: false, msg: "User is blocked" })
+        return res.status(400).json({ Login: false, message: "User is blocked" })
       }
       console.log("1",password,"  2",user.Password);
       console.log(user.Password);
@@ -77,17 +76,61 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
       const passMatch = await bcrypt.compare(password, user.Password)
   
       if (!passMatch) {
-        return res.status(400).json({ Login: false, msg: "Invalid credentials" })
+        console.log("password inc");
+        
+        return res.json({ Login: false, message: "Email and password is incorrect" })
+        
       }
 
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET as string, {
         expiresIn: '1h'});
   
-      res.status(200).json({ msg: "User Login successful", user: user ,token :token })
+      res.status(200).json({ message: "User Login successful", user: user ,token :token })
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: "Internal server error" })
     }
   }
 
+  export const GoogleLogin = async (req: Request, res: Response): Promise<any> => {
+    console.log("entering Google-loggin of user");
+    
+      try {
+        console.log(req.body);
+        
+        const { email,name } = req.body
+    
+        const user = await User.findOne({ Email: email })
+        console.log(user);
+        
+        if (!user) {
+          const { name, email} = req.body as {
+            name: string;
+            email: string;
+          }
+          
+          const newUser = new User({
+            Name: name,
+            Email: email
+          })
+
+          const SaveUser = await newUser.save()
+
+          res.status(201).json({ message: "User registered successfully ", user: SaveUser })
+          console.log("user registration succesfull (Google)");
+        }else{
+          if (user.block) {
+            return res.status(400).json({ Login: false, message: "User is blocked" })
+          }
+    
+          const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET as string, {
+            expiresIn: '1h'});
+      
+          res.status(200).json({ message: "User Google-Login successful", user: user ,token :token })
+        }
+      } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Internal server error" })
+      }
+    }
   
