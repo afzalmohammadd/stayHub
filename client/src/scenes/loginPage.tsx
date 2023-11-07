@@ -141,7 +141,7 @@ const LoginPage = () => {
                     className="underline underline-offset-2"
                     type="button"
                   >
-                    Forgot password?
+                    <Link to="/verifynumber">Forgot password?</Link>
                   </button>
                 </p>
               </div>

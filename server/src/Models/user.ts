@@ -19,11 +19,13 @@ export interface IUser extends Document {
       Email: {
         type: String,
         required: true,
+        unique:true,
         max: 50,
       },
       Phone: {
         type: String,
         required: false,
+        unique:true
       },
       Password: {
         type: String,

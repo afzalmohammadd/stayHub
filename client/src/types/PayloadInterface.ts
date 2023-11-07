@@ -22,6 +22,18 @@ export interface adminRegRequest {
   confirmPassword:string
 }
 
+export interface MobileVerificationReuest {
+  phone:string;
+}
+
+export interface OtpVerificationRequest {
+  otp:number;
+}
+
+export interface PasswordChangingRequest {
+  password: string;
+  confirmPassword: string
+}
 
 
 
